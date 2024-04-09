@@ -10,6 +10,12 @@ RUN apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 RUN python3 -m pip install -U pip
 RUN python3 -m pip install loguru tqdm thop ninja tabulate
 RUN python3 -m pip install pycocotools
+
+RUN wget -O ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run https://download.stereolabs.com/zedsdk/4.1/l4t35.2/jetsons
+RUN chmod +x ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run
+RUN apt install zstd
+RUN ./ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run -- silent
+
 RUN cd /root && git clone https://github.com/Megvii-BaseDetection/YOLOX.git
 RUN cd /root/YOLOX && \
     sed -i '/torchvision/d' requirements.txt && \
