@@ -29,9 +29,8 @@ RUN cd /root/YOLOX && \
     sed -i '/onnx/d' requirements.txt
 RUN cd /root/YOLOX && python3 -m pip install -v -e .
 RUN cd /root/YOLOX && wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.pth
-RUN cd /root/YOLOX && wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_tiny.pth
 
 # torch2trt
 RUN cd /root/YOLOX && git clone https://github.com/NVIDIA-AI-IOT/torch2trt ; 
-RUN cd /root/YOLOX/torch2trt; python3 setup.py install
-RUN cd /root/YOLOX && python3 tools/trt.py -n yolox-s -c yolox_s.pth ; python3 tools/trt.py -n yolox-tiny -c yolox_tiny.pth
+# RUN cd /root/YOLOX/torch2trt; python3 setup.py install
+# RUN cd /root/YOLOX && python3 tools/trt.py -n yolox-s -c yolox_s.pth
