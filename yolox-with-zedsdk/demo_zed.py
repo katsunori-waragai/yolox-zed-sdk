@@ -8,6 +8,7 @@ import time
 from loguru import logger
 
 import cv2
+import numpy as np
 
 import torch
 
@@ -18,6 +19,8 @@ from yolox.utils import fuse_model, get_model_info, postprocess, vis
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 
+
+import pyzed.sl as sl
 
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
@@ -207,10 +210,28 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
 
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
-    cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
-    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
-    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
-    fps = cap.get(cv2.CAP_PROP_FPS)
+    # Edit here
+    zed = sl.Camera()
+    init_params = sl.InitParameters()
+    init_params.coordinate_units = sl.UNIT.METER
+    init_params.depth_mode = sl.DEPTH_MODE.ULTRA  # QUALITY
+    init_params.coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
+    init_params.depth_maximum_distance = 50
+
+    status = zed.open(init_params)
+
+    if status != sl.ERROR_CODE.SUCCESS:
+        print(repr(status))
+        exit()
+    camera_info = zed.get_camera_information()
+    camera_res = camera_info.camera_configuration.resolution
+    width = camera_res.width
+    height = camera_res.height
+    fps = 15
+    # cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
+    # width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
+    # height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
+    # fps = cap.get(cv2.CAP_PROP_FPS)
     if args.save_result:
         save_folder = os.path.join(
             vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
@@ -224,11 +245,20 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         vid_writer = cv2.VideoWriter(
             save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
         )
+
+    image = sl.Mat()
     while True:
-        ret_val, frame = cap.read()
-        if ret_val:
-            outputs, img_info = predictor.inference(frame)
+        if zed.grab(sl.RuntimeParameters()) != sl.ERROR_CODE.SUCCESS:
+            exit_signal = True
+            continue
+        zed.retrieve_image(image, sl.VIEW.LEFT, sl.MEM.CPU, camera_res)
+        frame = image.get_data()
+        bgr = np.array(frame[:,:, :3], dtype=np.uint8)
+        # ret_val, frame = cap.read()
+        if frame is not None:
+            outputs, img_info = predictor.inference(bgr)
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
+            # print(f"{outputs=}")
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
