@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
-import numpy as np
-
 import argparse
-import torch
 import cv2
 import pyzed.sl as sl
-
-from time import sleep
-
 
 
 def main():
@@ -36,23 +29,11 @@ def main():
         print(repr(status))
         exit()
 
-    image_left_tmp = sl.Mat()
-
     print("Initialized Camera")
 
 
-    objects = sl.Objects()
-    obj_runtime_param = sl.ObjectDetectionRuntimeParameters()
 
     # Display
-    camera_infos = zed.get_camera_information()
-    camera_res = camera_infos.camera_configuration.resolution
-    # Create OpenGL viewer
-    # viewer = gl.GLViewer()
-    point_cloud_res = sl.Resolution(min(camera_res.width, 720), min(camera_res.height, 404))
-    point_cloud_render = sl.Mat()
-    # viewer.init(camera_infos.camera_model, point_cloud_res, obj_param.enable_tracking)
-    point_cloud = sl.Mat(point_cloud_res.width, point_cloud_res.height, sl.MAT_TYPE.F32_C4, sl.MEM.CPU)
     image_left = sl.Mat()
 
     while 1:
@@ -80,5 +61,4 @@ if __name__ == '__main__':
     parser.add_argument('--conf_thres', type=float, default=0.4, help='object confidence threshold')
     opt = parser.parse_args()
 
-    with torch.no_grad():
-        main()
+    main()
