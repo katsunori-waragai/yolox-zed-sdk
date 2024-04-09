@@ -5,6 +5,7 @@ from loguru import logger
 import os
 
 import cv2
+import numpy as np
 import pyzed.sl as sl
 
 from yolox.data.data_augment import ValTransform
@@ -75,15 +76,20 @@ def main(exp, args):
 
     predictor = Predictor(
         model, exp, COCO_CLASSES, trt_file, decoder,
-        "gpu", args.fp16, args.legacy,
+        "cpu", args.fp16, args.legacy,
     )
     while 1:
-        # or viewer.is_available() and not exit_signal:
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
             # -- Get the image
             zed.retrieve_image(image_left, sl.VIEW.LEFT)
             frame = image_left.get_data()
+            frame = np.array(frame[:, :, :3], dtype=np.uint8)
+            assert len(frame.shape) == 3
+            assert frame.shape[2] == 3
+            cv2.imwrite("junk.jpg", frame)
+            # frame = cv2.imread("junk.jpg")
             outputs, img_info = predictor.inference(frame)
+            print(f"{outputs=}")
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
 
             cv2.imshow("ZED | 2D View and Birds View", result_frame)
