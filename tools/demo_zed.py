@@ -274,6 +274,13 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             """
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
             # print(f"{outputs=}")
+            """
+            det = detections_to_custom_box((outputs[0], img_info, predictor.confthre)
+            detections = detections_to_custom_box(det, image_net)
+            zed.ingest_custom_box_objects(detections)
+            zed.retrieve_objects(objects, obj_runtime_param)
+
+            """
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
