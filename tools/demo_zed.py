@@ -168,7 +168,7 @@ class Predictor(object):
             logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
 
-    def visual(self, output, img_info, cls_conf=0.35):
+    def _parse(self, output, img_info):
         ratio = img_info["ratio"]
         img = img_info["raw_img"]
         if output is None:
@@ -182,8 +182,16 @@ class Predictor(object):
 
         cls = output[:, 6]
         scores = output[:, 4] * output[:, 5]
+        return img, bboxes, scores, cls
 
+    def visual(self, output, img_info, cls_conf=0.35):
+        """
+        
+        """
+
+        img, bboxes, scores, cls = self._parse(output, img_info)
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
+        assert vis_res.shape == img.shape
         return vis_res
 
 
@@ -257,8 +265,22 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         # ret_val, frame = cap.read()
         if frame is not None:
             outputs, img_info = predictor.inference(bgr)
+            print(f"{outputs=}")
+            print(f"{outputs[0]=}")  # tensor
+            print(f"{img_info=}")
+            print(f"{img_info.keys()=}")
+            """
+            img_info.keys()=dict_keys(['id', 'file_name', 'height', 'width', 'raw_img', 'ratio'])
+            """
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
             # print(f"{outputs=}")
+            """
+            det = detections_to_custom_box((outputs[0], img_info, predictor.confthre)
+            detections = detections_to_custom_box(det, image_net)
+            zed.ingest_custom_box_objects(detections)
+            zed.retrieve_objects(objects, obj_runtime_param)
+
+            """
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
