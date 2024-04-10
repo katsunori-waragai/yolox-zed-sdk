@@ -349,6 +349,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             zed.retrieve_objects(objects, obj_runtime_param)
             for i, obj in enumerate(objects.object_list):
                 print(f"{i} {obj.raw_label=} {obj.bounding_box_2d=} {obj.confidence=}")
+                print(f"{i} {obj.bounding_box=}")
 
             # Retrieve display data
             zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
