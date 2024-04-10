@@ -1,10 +1,13 @@
-# yolox-docker
-docker environment for YOLOX on Jetson AGX Orin
+# yolox-zed-sdk
+docker environment for YOLOX on Jetson AGX Orin with ZED SDK
 
-## sumamry
-- Dockerfile をコピーして、Jetpackのバージョンに合わせて書き直した。
-- それを使って、最低限の実行ができるところまでは確認した。入力、出力が動画ファイルの分だけ確認している。
-- use docker image l4t-pytorch:r35.2.1-pth2.0-py3
+- Pytorchを含むJetson 用のDockerImage を用いて、 ZED SDK を利用できる環境を提供する。
+- ZED SDK によるデータ取得を用いて、その環境内でyoloxによる物体検出を実行する。
+
+## requirement
+- StereoLabs ZED2i camera
+- NVIDIA Jetson AGX Orin
+- docker
 
 ### docker
 ```
@@ -12,9 +15,6 @@ $ xhost +
 $ bash docker_build.sh
 $ bash docker_run.sh
 ```
-
-saved results in YOLOX/YOLOX_outputs/yolox_s/vis_res/
-
 
 ### tools/demo.py の使い方
 
