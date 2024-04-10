@@ -169,6 +169,9 @@ class Predictor(object):
         return outputs, img_info
 
     def visual(self, output, img_info, cls_conf=0.35):
+        """
+        
+        """
         ratio = img_info["ratio"]
         img = img_info["raw_img"]
         if output is None:
@@ -184,6 +187,7 @@ class Predictor(object):
         scores = output[:, 4] * output[:, 5]
 
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
+        assert vis_res.shape == img.shape
         return vis_res
 
 
@@ -258,8 +262,12 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         if frame is not None:
             outputs, img_info = predictor.inference(bgr)
             print(f"{outputs=}")
+            print(f"{outputs[0]=}")  # tensor
             print(f"{img_info=}")
             print(f"{img_info.keys()=}")
+            """
+            img_info.keys()=dict_keys(['id', 'file_name', 'height', 'width', 'raw_img', 'ratio'])
+            """
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
             # print(f"{outputs=}")
             if args.save_result:
