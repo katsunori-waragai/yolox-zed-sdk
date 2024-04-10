@@ -7,7 +7,6 @@ import argparse
 import torch
 import cv2
 import pyzed.sl as sl
-from ultralytics import YOLO
 
 from threading import Lock, Thread
 from time import sleep
@@ -62,6 +61,8 @@ def detections_to_custom_box(detections, im0):
 
 
 def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
+    from ultralytics import YOLO
+
     global image_net, exit_signal, run_signal, detections
 
     print("Intializing Network...")
@@ -85,6 +86,8 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
 
 def main():
     global image_net, exit_signal, run_signal, detections
+
+    torch.no_grad()
 
     capture_thread = Thread(target=torch_thread, kwargs={'weights': opt.weights, 'img_size': opt.img_size, "conf_thres": opt.conf_thres})
     capture_thread.start()
@@ -208,5 +211,4 @@ if __name__ == '__main__':
     parser.add_argument('--conf_thres', type=float, default=0.4, help='object confidence threshold')
     opt = parser.parse_args()
 
-    with torch.no_grad():
-        main()
+    main()
