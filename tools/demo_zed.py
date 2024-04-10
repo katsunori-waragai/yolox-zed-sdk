@@ -240,6 +240,7 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
     view_gl = False
+    view_cv = True
     # Edit here
     zed = sl.Camera()
     init_params = sl.InitParameters()
@@ -311,7 +312,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     # Utilities for tracks view
     camera_config = camera_infos.camera_configuration
     tracks_resolution = sl.Resolution(400, display_resolution.height)
-    if view_gl:
+    if view_cv:
         track_view_generator = cv_viewer.TrackingViewer(tracks_resolution, camera_config.fps, init_params.depth_maximum_distance)
         track_view_generator.set_camera_calibration(camera_config.calibration_parameters)
     image_track_ocv = np.zeros((tracks_resolution.height, tracks_resolution.width, 4), np.uint8)
@@ -367,12 +368,13 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking)
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
             # Tracking view
-            if view_gl:
+            if view_cv:
                 track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
 
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
+                cv2.imshow("ZED | 2D View and Birds View", global_image)
                 cv2.namedWindow("yolox", cv2.WINDOW_NORMAL)
                 cv2.imshow("yolox", result_frame)
             ch = cv2.waitKey(1)
