@@ -5,6 +5,8 @@
 import argparse
 import os
 import time
+from typing import List
+
 from loguru import logger
 
 import cv2
@@ -195,6 +197,21 @@ class Predictor(object):
         return vis_res
 
 
+def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBoxObjectData]:
+    output = []
+    for i, bbox in enumerate(bboxes):
+        print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
+        xmin, ymin, xmax, ymax = bbox
+        abcd = np.array([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])
+        # Creating ingestable objects for the ZED SDK
+        obj = sl.CustomBoxObjectData()
+        obj.bounding_box_2d = abcd
+        obj.label = cls[i]
+        obj.probability = scores[i]
+        obj.is_grounded = False
+        output.append(obj)
+    return output
+
 def image_demo(predictor, vis_folder, path, current_time, save_result):
     if os.path.isdir(path):
         files = get_image_list(path)
@@ -255,6 +272,9 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         )
 
     image = sl.Mat()
+    objects = sl.Objects()
+    obj_runtime_param = sl.ObjectDetectionRuntimeParameters()
+
     while True:
         if zed.grab(sl.RuntimeParameters()) != sl.ERROR_CODE.SUCCESS:
             exit_signal = True
@@ -274,13 +294,18 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             """
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
             # print(f"{outputs=}")
+            img, bboxes, scores, cls = predictor._parse(outputs[0], img_info)
+            detections = yolox_detections_to_custom_box(img, bboxes, scores, cls)
+            print(f"{detections=}")
             """
-            det = detections_to_custom_box((outputs[0], img_info, predictor.confthre)
-            detections = detections_to_custom_box(det, image_net)
+            [2024-04-10 07:13:23 UTC][ZED][WARNING] Camera::ingestCustomBoxObjects: Invalid instance_id value
+            [2024-04-10 07:13:23 UTC][ZED][WARNING] INVALID FUNCTION CALL in sl::ERROR_CODE sl::Camera::ingestCustomBoxObjects(std::vector<sl::CustomBoxObjectData>&, unsigned int)
+            [2024-04-10 07:13:23 UTC][ZED][WARNING] INVALID FUNCTION CALL in sl::ERROR_CODE sl::Camera::retrieveObjects(sl::Objects&, sl::ObjectDetectionRuntimeParameters, unsigned int)
+            """
             zed.ingest_custom_box_objects(detections)
             zed.retrieve_objects(objects, obj_runtime_param)
-
-            """
+            for i, obj in enumerate(objects.object_list):
+                print(f"{i} {obj=}")
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
