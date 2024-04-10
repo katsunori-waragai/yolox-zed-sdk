@@ -210,6 +210,7 @@ def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBo
         obj = sl.CustomBoxObjectData()
         obj.bounding_box_2d = abcd
         obj.label = cls[i]
+        assert isinstance(obj.label, int)
         obj.probability = scores[i]
         obj.is_grounded = False
         output.append(obj)
