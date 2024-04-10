@@ -205,6 +205,8 @@ def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBo
     for i, bbox in enumerate(bboxes):
         # print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
         xmin, ymin, xmax, ymax = bbox
+        xmin = max(xmin, 0)
+        ymin = max(ymin, 0)
         abcd = np.array([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])
         # Creating ingestable objects for the ZED SDK
         obj = sl.CustomBoxObjectData()
