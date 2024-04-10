@@ -172,20 +172,23 @@ class Predictor(object):
         """
         
         """
-        ratio = img_info["ratio"]
-        img = img_info["raw_img"]
-        if output is None:
-            return img
-        output = output.cpu()
+        def _parse(output, img_info):
+            ratio = img_info["ratio"]
+            img = img_info["raw_img"]
+            if output is None:
+                return img
+            output = output.cpu()
 
-        bboxes = output[:, 0:4]
+            bboxes = output[:, 0:4]
 
-        # preprocessing: resize
-        bboxes /= ratio
+            # preprocessing: resize
+            bboxes /= ratio
 
-        cls = output[:, 6]
-        scores = output[:, 4] * output[:, 5]
+            cls = output[:, 6]
+            scores = output[:, 4] * output[:, 5]
+            return img, bboxes, scores, cls
 
+        img, bboxes, scores, cls = _parse(output, img_info)
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
         assert vis_res.shape == img.shape
         return vis_res
