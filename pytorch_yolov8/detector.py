@@ -4,6 +4,8 @@ import sys
 import numpy as np
 
 import argparse
+from typing import List
+
 import torch
 import cv2
 import pyzed.sl as sl
@@ -45,7 +47,7 @@ def xywh2abcd(xywh, im_shape):
     output[3][1] = y_max
     return output
 
-def detections_to_custom_box(detections, im0):
+def detections_to_custom_box(detections, im0) -> List[sl.CustomBoxObjectData]:
     output = []
     for i, det in enumerate(detections):
         xywh = det.xywh[0]
