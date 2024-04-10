@@ -203,8 +203,10 @@ class Predictor(object):
 def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBoxObjectData]:
     output = []
     for i, bbox in enumerate(bboxes):
-        print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
+        # print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
         xmin, ymin, xmax, ymax = bbox
+        xmin = max(xmin, 0)
+        ymin = max(ymin, 0)
         abcd = np.array([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])
         # Creating ingestable objects for the ZED SDK
         obj = sl.CustomBoxObjectData()
@@ -240,6 +242,7 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
     view_gl = False
+    view_cv = True
     # Edit here
     zed = sl.Camera()
     init_params = sl.InitParameters()
@@ -311,7 +314,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     # Utilities for tracks view
     camera_config = camera_infos.camera_configuration
     tracks_resolution = sl.Resolution(400, display_resolution.height)
-    if view_gl:
+    if view_cv:
         track_view_generator = cv_viewer.TrackingViewer(tracks_resolution, camera_config.fps, init_params.depth_maximum_distance)
         track_view_generator.set_camera_calibration(camera_config.calibration_parameters)
     image_track_ocv = np.zeros((tracks_resolution.height, tracks_resolution.width, 4), np.uint8)
@@ -339,7 +342,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             # print(f"{outputs=}")
             img, bboxes, scores, cls = predictor._parse(outputs[0], img_info)
             detections = yolox_detections_to_custom_box(img, bboxes, scores, cls)
-            print(f"{detections=}")
+            # print(f"{detections=}")
             """
             [2024-04-10 07:13:23 UTC][ZED][WARNING] Camera::ingestCustomBoxObjects: Invalid instance_id value
             [2024-04-10 07:13:23 UTC][ZED][WARNING] INVALID FUNCTION CALL in sl::ERROR_CODE sl::Camera::ingestCustomBoxObjects(std::vector<sl::CustomBoxObjectData>&, unsigned int)
@@ -347,9 +350,11 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             """
             zed.ingest_custom_box_objects(detections)
             zed.retrieve_objects(objects, obj_runtime_param)
-            for i, obj in enumerate(objects.object_list):
-                print(f"{i} {obj.raw_label=} {obj.bounding_box_2d=} {obj.confidence=}")
-                print(f"{i} {obj.bounding_box=}")
+            show_retrieved = False
+            if show_retrieved:
+                for i, obj in enumerate(objects.object_list):
+                    print(f"{i} {obj.raw_label=} {obj.bounding_box_2d=} {obj.confidence=}")
+                    print(f"{i} {obj.bounding_box=}")
 
             # Retrieve display data
             zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
@@ -365,12 +370,13 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking)
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
             # Tracking view
-            if view_gl:
+            if view_cv:
                 track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
 
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
+                cv2.imshow("ZED | 2D View and Birds View", global_image)
                 cv2.namedWindow("yolox", cv2.WINDOW_NORMAL)
                 cv2.imshow("yolox", result_frame)
             ch = cv2.waitKey(1)
