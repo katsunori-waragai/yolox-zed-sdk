@@ -328,10 +328,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         # ret_val, frame = cap.read()
         if frame is not None:
             outputs, img_info = predictor.inference(bgr)
-            print(f"{outputs=}")
-            print(f"{outputs[0]=}")  # tensor
-            print(f"{img_info=}")
-            print(f"{img_info.keys()=}")
+            # print(f"{outputs=}")
+            # print(f"{outputs[0]=}")  # tensor
+            # print(f"{img_info=}")
+            # print(f"{img_info.keys()=}")
             """
             img_info.keys()=dict_keys(['id', 'file_name', 'height', 'width', 'raw_img', 'ratio'])
             """
@@ -348,7 +348,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             zed.ingest_custom_box_objects(detections)
             zed.retrieve_objects(objects, obj_runtime_param)
             for i, obj in enumerate(objects.object_list):
-                print(f"{i} {obj=}")
+                print(f"{i} {obj.raw_label=} {obj.bounding_box_2d=} {obj.confidence=}")
 
             # Retrieve display data
             zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
