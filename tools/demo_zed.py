@@ -5,6 +5,8 @@
 import argparse
 import os
 import time
+from typing import List
+
 from loguru import logger
 
 import cv2
@@ -195,6 +197,21 @@ class Predictor(object):
         return vis_res
 
 
+def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBoxObjectData]:
+    output = []
+    for i, bbox in enumerate(bboxes):
+        print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
+        xmin, ymin, xmax, ymax = bbox
+        abcd = np.array([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])
+        # Creating ingestable objects for the ZED SDK
+        obj = sl.CustomBoxObjectData()
+        obj.bounding_box_2d = abcd
+        obj.label = cls[i]
+        obj.probability = scores[i]
+        obj.is_grounded = False
+        output.append(obj)
+    return output
+
 def image_demo(predictor, vis_folder, path, current_time, save_result):
     if os.path.isdir(path):
         files = get_image_list(path)
@@ -274,8 +291,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             """
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
             # print(f"{outputs=}")
+            img, bboxes, scores, cls = predictor._parse(outputs[0], img_info)
+            yolox_detections_to_custom_box(img, bboxes, scores, cls)
             """
-            det = detections_to_custom_box((outputs[0], img_info, predictor.confthre)
+            det = yolox_detections_to_custom_box(outputs[0], img_info, predictor.confthre)
             detections = detections_to_custom_box(det, image_net)
             zed.ingest_custom_box_objects(detections)
             zed.retrieve_objects(objects, obj_runtime_param)
