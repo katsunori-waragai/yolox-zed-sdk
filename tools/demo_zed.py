@@ -24,6 +24,9 @@ IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 
 import pyzed.sl as sl
 
+import ogl_viewer.viewer as gl
+import cv_viewer.tracking_viewer as cv_viewer
+
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
     parser.add_argument(
@@ -207,6 +210,7 @@ def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBo
         obj = sl.CustomBoxObjectData()
         obj.bounding_box_2d = abcd
         obj.label = cls[i]
+        assert isinstance(obj.label, int)
         obj.probability = scores[i]
         obj.is_grounded = False
         output.append(obj)
@@ -235,6 +239,7 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
 
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
+    view_gl = False
     # Edit here
     zed = sl.Camera()
     init_params = sl.InitParameters()
@@ -248,6 +253,12 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     if status != sl.ERROR_CODE.SUCCESS:
         print(repr(status))
         exit()
+
+    positional_tracking_parameters = sl.PositionalTrackingParameters()
+    # If the camera is static, uncomment the following line to have better performances and boxes sticked to the ground.
+    # positional_tracking_parameters.set_as_static = True
+    zed.enable_positional_tracking(positional_tracking_parameters)
+
     camera_info = zed.get_camera_information()
     camera_res = camera_info.camera_configuration.resolution
     width = camera_res.width
@@ -271,9 +282,41 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
         )
 
+
+    obj_param = sl.ObjectDetectionParameters()
+    obj_param.detection_model = sl.OBJECT_DETECTION_MODEL.CUSTOM_BOX_OBJECTS
+    obj_param.enable_tracking = True
+    zed.enable_object_detection(obj_param)
+
     image = sl.Mat()
     objects = sl.Objects()
     obj_runtime_param = sl.ObjectDetectionRuntimeParameters()
+
+    # Display
+    camera_infos = zed.get_camera_information()
+    camera_res = camera_infos.camera_configuration.resolution
+    # Create OpenGL viewer
+    point_cloud_res = sl.Resolution(min(camera_res.width, 720), min(camera_res.height, 404))
+    point_cloud_render = sl.Mat()
+    point_cloud = sl.Mat(point_cloud_res.width, point_cloud_res.height, sl.MAT_TYPE.F32_C4, sl.MEM.CPU)
+    if view_gl:
+        viewer = gl.GLViewer()
+        viewer.init(camera_infos.camera_model, point_cloud_res, obj_param.enable_tracking)
+    image_left = sl.Mat()
+    # Utilities for 2D display
+    display_resolution = sl.Resolution(min(camera_res.width, 1280), min(camera_res.height, 720))
+    image_scale = [display_resolution.width / camera_res.width, display_resolution.height / camera_res.height]
+    image_left_ocv = np.full((display_resolution.height, display_resolution.width, 4), [245, 239, 239, 255], np.uint8)
+
+    # Utilities for tracks view
+    camera_config = camera_infos.camera_configuration
+    tracks_resolution = sl.Resolution(400, display_resolution.height)
+    if view_gl:
+        track_view_generator = cv_viewer.TrackingViewer(tracks_resolution, camera_config.fps, init_params.depth_maximum_distance)
+        track_view_generator.set_camera_calibration(camera_config.calibration_parameters)
+    image_track_ocv = np.zeros((tracks_resolution.height, tracks_resolution.width, 4), np.uint8)
+    # Camera pose
+    cam_w_pose = sl.Pose()
 
     while True:
         if zed.grab(sl.RuntimeParameters()) != sl.ERROR_CODE.SUCCESS:
@@ -285,10 +328,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         # ret_val, frame = cap.read()
         if frame is not None:
             outputs, img_info = predictor.inference(bgr)
-            print(f"{outputs=}")
-            print(f"{outputs[0]=}")  # tensor
-            print(f"{img_info=}")
-            print(f"{img_info.keys()=}")
+            # print(f"{outputs=}")
+            # print(f"{outputs[0]=}")  # tensor
+            # print(f"{img_info=}")
+            # print(f"{img_info.keys()=}")
             """
             img_info.keys()=dict_keys(['id', 'file_name', 'height', 'width', 'raw_img', 'ratio'])
             """
@@ -305,7 +348,26 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             zed.ingest_custom_box_objects(detections)
             zed.retrieve_objects(objects, obj_runtime_param)
             for i, obj in enumerate(objects.object_list):
-                print(f"{i} {obj=}")
+                print(f"{i} {obj.raw_label=} {obj.bounding_box_2d=} {obj.confidence=}")
+                print(f"{i} {obj.bounding_box=}")
+
+            # Retrieve display data
+            zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
+            point_cloud.copy_to(point_cloud_render)
+            zed.retrieve_image(image_left, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
+            zed.get_position(cam_w_pose, sl.REFERENCE_FRAME.WORLD)
+
+            # 3D rendering
+            if view_gl:
+                viewer.updateData(point_cloud_render, objects)
+            # 2D rendering
+            np.copyto(image_left_ocv, image_left.get_data())
+            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking)
+            global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
+            # Tracking view
+            if view_gl:
+                track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
+
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
