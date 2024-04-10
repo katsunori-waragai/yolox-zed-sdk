@@ -259,6 +259,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             outputs, img_info = predictor.inference(bgr)
             print(f"{outputs=}")
             print(f"{img_info=}")
+            print(f"{img_info.keys()=}")
             result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
             # print(f"{outputs=}")
             if args.save_result:
