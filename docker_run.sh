@@ -1,5 +1,5 @@
 #!/bin/bash
-export GIT_ROOT=$(cd $(dirname $0); pwd)
+export GIT_ROOT=$(cd $(dirname $0)/.. ; pwd)
 sudo docker run -it --rm --net=host --runtime nvidia -e DISPLAY=$DISPLAY \
 	-v ${GIT_ROOT}/yolox-docker/YOLOX_outputs:/root/YOLOX/YOLOX_outputs \
   -v ${GIT_ROOT}/yolox-docker:/root/YOLOX/yolox-docker \
