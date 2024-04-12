@@ -21,6 +21,7 @@ RUN ./ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run -- silent
 RUN python3 -m pip install ultralytics
 RUN python3 -m pip install opencv-python==3.4.18.65
 RUN python3 -m pip install PyOpenGL
+RUN python3 -m pip install PyOpenGL-accelerate
 
 RUN cd /root && git clone https://github.com/Megvii-BaseDetection/YOLOX.git
 RUN cd /root/YOLOX && \
