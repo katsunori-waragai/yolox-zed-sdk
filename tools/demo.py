@@ -5,9 +5,12 @@
 import argparse
 import os
 import time
+from typing import List
+
 from loguru import logger
 
 import cv2
+import numpy as np
 
 import torch
 
@@ -22,7 +25,7 @@ IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
     parser.add_argument(
-        "demo", default="image", help="demo type, eg. image, video and webcam"
+        "demo", default="webcam", help="demo type, eg. image, video and webcam"
     )
     parser.add_argument("-expn", "--experiment-name", type=str, default=None)
     parser.add_argument("-n", "--name", type=str, default=None, help="model name")
@@ -84,17 +87,6 @@ def make_parser():
         help="Using TensorRT model for testing.",
     )
     return parser
-
-
-def get_image_list(path):
-    image_names = []
-    for maindir, subdir, file_name_list in os.walk(path):
-        for filename in file_name_list:
-            apath = os.path.join(maindir, filename)
-            ext = os.path.splitext(apath)[1]
-            if ext in IMAGE_EXT:
-                image_names.append(apath)
-    return image_names
 
 
 class Predictor(object):
@@ -165,7 +157,7 @@ class Predictor(object):
             logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
 
-    def visual(self, output, img_info, cls_conf=0.35):
+    def _parse(self, output, img_info):
         ratio = img_info["ratio"]
         img = img_info["raw_img"]
         if output is None:
@@ -179,34 +171,39 @@ class Predictor(object):
 
         cls = output[:, 6]
         scores = output[:, 4] * output[:, 5]
+        return img, bboxes, scores, cls
 
+    def visual(self, output, img_info, cls_conf=0.35):
+        """
+        
+        """
+
+        img, bboxes, scores, cls = self._parse(output, img_info)
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
+        assert vis_res.shape == img.shape
         return vis_res
 
 
-def image_demo(predictor, vis_folder, path, current_time, save_result):
-    if os.path.isdir(path):
-        files = get_image_list(path)
-    else:
-        files = [path]
-    files.sort()
-    for image_name in files:
-        outputs, img_info = predictor.inference(image_name)
-        result_image = predictor.visual(outputs[0], img_info, predictor.confthre)
-        if save_result:
-            save_folder = os.path.join(
-                vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
-            )
-            os.makedirs(save_folder, exist_ok=True)
-            save_file_name = os.path.join(save_folder, os.path.basename(image_name))
-            logger.info("Saving detection result in {}".format(save_file_name))
-            cv2.imwrite(save_file_name, result_image)
-        ch = cv2.waitKey(0)
-        if ch == 27 or ch == ord("q") or ch == ord("Q"):
-            break
+def yolox_detections_to_custom_box(img, bboxes, scores, cls):
+    import pyzed.sl as sl
+    output = []
+    for i, bbox in enumerate(bboxes):
+        # print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
+        xmin, ymin, xmax, ymax = bbox
+        xmin = max(xmin, 0)
+        ymin = max(ymin, 0)
+        abcd = np.array([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])
+        # Creating ingestable objects for the ZED SDK
+        obj = sl.CustomBoxObjectData()
+        obj.bounding_box_2d = abcd
+        obj.label = cls[i]
+        assert isinstance(obj.label, int)
+        obj.probability = scores[i]
+        obj.is_grounded = False
+        output.append(obj)
+    return output
 
-
-def imageflow_demo(predictor, vis_folder, current_time, args):
+def imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args):
     cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
@@ -232,6 +229,154 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
+                cv2.namedWindow("yolox", cv2.WINDOW_NORMAL)
+                cv2.imshow("yolox", result_frame)
+            ch = cv2.waitKey(1)
+            if ch == 27 or ch == ord("q") or ch == ord("Q"):
+                break
+        else:
+            break
+
+def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
+    import pyzed.sl as sl
+    import ogl_viewer.viewer as gl
+    import cv_viewer.tracking_viewer as cv_viewer
+    view_gl = True
+    view_cv = True
+    # Edit here
+    zed = sl.Camera()
+    init_params = sl.InitParameters()
+    init_params.coordinate_units = sl.UNIT.METER
+    init_params.depth_mode = sl.DEPTH_MODE.ULTRA  # QUALITY
+    init_params.coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
+    init_params.depth_maximum_distance = 50
+
+    status = zed.open(init_params)
+
+    if status != sl.ERROR_CODE.SUCCESS:
+        print(repr(status))
+        exit()
+
+    positional_tracking_parameters = sl.PositionalTrackingParameters()
+    # If the camera is static, uncomment the following line to have better performances and boxes sticked to the ground.
+    # positional_tracking_parameters.set_as_static = True
+    zed.enable_positional_tracking(positional_tracking_parameters)
+
+    camera_info = zed.get_camera_information()
+    camera_res = camera_info.camera_configuration.resolution
+    width = camera_res.width
+    height = camera_res.height
+    fps = 15
+    # cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
+    # width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
+    # height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
+    # fps = cap.get(cv2.CAP_PROP_FPS)
+    if args.save_result:
+        save_folder = os.path.join(
+            vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
+        )
+        os.makedirs(save_folder, exist_ok=True)
+        if args.demo == "video":
+            save_path = os.path.join(save_folder, os.path.basename(args.path))
+        else:
+            save_path = os.path.join(save_folder, "camera.mp4")
+        logger.info(f"video save_path is {save_path}")
+        vid_writer = cv2.VideoWriter(
+            save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
+        )
+
+
+    obj_param = sl.ObjectDetectionParameters()
+    obj_param.detection_model = sl.OBJECT_DETECTION_MODEL.CUSTOM_BOX_OBJECTS
+    obj_param.enable_tracking = True
+    zed.enable_object_detection(obj_param)
+
+    image = sl.Mat()
+    objects = sl.Objects()
+    obj_runtime_param = sl.ObjectDetectionRuntimeParameters()
+
+    # Display
+    camera_infos = zed.get_camera_information()
+    camera_res = camera_infos.camera_configuration.resolution
+    # Create OpenGL viewer
+    point_cloud_res = sl.Resolution(min(camera_res.width, 720), min(camera_res.height, 404))
+    point_cloud_render = sl.Mat()
+    point_cloud = sl.Mat(point_cloud_res.width, point_cloud_res.height, sl.MAT_TYPE.F32_C4, sl.MEM.CPU)
+    if view_gl:
+        viewer = gl.GLViewer()
+        viewer.init(camera_infos.camera_model, point_cloud_res, obj_param.enable_tracking)
+    image_left = sl.Mat()
+    # Utilities for 2D display
+    display_resolution = sl.Resolution(min(camera_res.width, 1280), min(camera_res.height, 720))
+    image_scale = [display_resolution.width / camera_res.width, display_resolution.height / camera_res.height]
+    image_left_ocv = np.full((display_resolution.height, display_resolution.width, 4), [245, 239, 239, 255], np.uint8)
+
+    # Utilities for tracks view
+    camera_config = camera_infos.camera_configuration
+    tracks_resolution = sl.Resolution(400, display_resolution.height)
+    if view_cv:
+        track_view_generator = cv_viewer.TrackingViewer(tracks_resolution, camera_config.fps, init_params.depth_maximum_distance)
+        track_view_generator.set_camera_calibration(camera_config.calibration_parameters)
+    image_track_ocv = np.zeros((tracks_resolution.height, tracks_resolution.width, 4), np.uint8)
+    # Camera pose
+    cam_w_pose = sl.Pose()
+
+    while True:
+        if zed.grab(sl.RuntimeParameters()) != sl.ERROR_CODE.SUCCESS:
+            exit_signal = True
+            continue
+        zed.retrieve_image(image, sl.VIEW.LEFT, sl.MEM.CPU, camera_res)
+        frame = image.get_data()
+        bgr = np.array(frame[:,:, :3], dtype=np.uint8)
+        # ret_val, frame = cap.read()
+        if frame is not None:
+            outputs, img_info = predictor.inference(bgr)
+            # print(f"{outputs=}")
+            # print(f"{outputs[0]=}")  # tensor
+            # print(f"{img_info=}")
+            # print(f"{img_info.keys()=}")
+            """
+            img_info.keys()=dict_keys(['id', 'file_name', 'height', 'width', 'raw_img', 'ratio'])
+            """
+            result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
+            # print(f"{outputs=}")
+            img, bboxes, scores, cls = predictor._parse(outputs[0], img_info)
+            detections = yolox_detections_to_custom_box(img, bboxes, scores, cls)
+            # print(f"{detections=}")
+            """
+            [2024-04-10 07:13:23 UTC][ZED][WARNING] Camera::ingestCustomBoxObjects: Invalid instance_id value
+            [2024-04-10 07:13:23 UTC][ZED][WARNING] INVALID FUNCTION CALL in sl::ERROR_CODE sl::Camera::ingestCustomBoxObjects(std::vector<sl::CustomBoxObjectData>&, unsigned int)
+            [2024-04-10 07:13:23 UTC][ZED][WARNING] INVALID FUNCTION CALL in sl::ERROR_CODE sl::Camera::retrieveObjects(sl::Objects&, sl::ObjectDetectionRuntimeParameters, unsigned int)
+            """
+            zed.ingest_custom_box_objects(detections)
+            zed.retrieve_objects(objects, obj_runtime_param)
+            show_retrieved = False
+            if show_retrieved:
+                for i, obj in enumerate(objects.object_list):
+                    print(f"{i} {obj.raw_label=} {obj.bounding_box_2d=} {obj.confidence=}")
+                    print(f"{i} {obj.bounding_box=}")
+
+            # Retrieve display data
+            zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
+            point_cloud.copy_to(point_cloud_render)
+            zed.retrieve_image(image_left, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
+            zed.get_position(cam_w_pose, sl.REFERENCE_FRAME.WORLD)
+
+            # 3D rendering
+            if view_gl:
+                viewer.updateData(point_cloud_render, objects)
+            # 2D rendering
+            np.copyto(image_left_ocv, image_left.get_data())
+            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking)
+            global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
+            # Tracking view
+            if view_cv:
+                track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
+
+            if args.save_result:
+                vid_writer.write(result_frame)
+            else:
+                cv2.imshow("ZED | 2D View and Birds View", global_image)
                 cv2.namedWindow("yolox", cv2.WINDOW_NORMAL)
                 cv2.imshow("yolox", result_frame)
             ch = cv2.waitKey(1)
@@ -308,9 +453,9 @@ def main(exp, args):
     )
     current_time = time.localtime()
     if args.demo == "image":
-        image_demo(predictor, vis_folder, args.path, current_time, args.save_result)
+        print("remove image option for simplification")
     elif args.demo == "video" or args.demo == "webcam":
-        imageflow_demo(predictor, vis_folder, current_time, args)
+        imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args)
 
 
 if __name__ == "__main__":

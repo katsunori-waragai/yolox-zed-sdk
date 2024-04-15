@@ -22,15 +22,10 @@ from yolox.utils import fuse_model, get_model_info, postprocess, vis
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 
 
-import pyzed.sl as sl
-
-import ogl_viewer.viewer as gl
-import cv_viewer.tracking_viewer as cv_viewer
-
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
     parser.add_argument(
-        "demo", default="image", help="demo type, eg. image, video and webcam"
+        "demo", default="webcam", help="demo type, eg. image, video and webcam"
     )
     parser.add_argument("-expn", "--experiment-name", type=str, default=None)
     parser.add_argument("-n", "--name", type=str, default=None, help="model name")
@@ -91,18 +86,14 @@ def make_parser():
         action="store_true",
         help="Using TensorRT model for testing.",
     )
+    parser.add_argument(
+        "--as_USB",
+        default=False,
+        action="store_true",
+        help="camera as USB Camera",
+    )
+
     return parser
-
-
-def get_image_list(path):
-    image_names = []
-    for maindir, subdir, file_name_list in os.walk(path):
-        for filename in file_name_list:
-            apath = os.path.join(maindir, filename)
-            ext = os.path.splitext(apath)[1]
-            if ext in IMAGE_EXT:
-                image_names.append(apath)
-    return image_names
 
 
 class Predictor(object):
@@ -200,7 +191,8 @@ class Predictor(object):
         return vis_res
 
 
-def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBoxObjectData]:
+def yolox_detections_to_custom_box(img, bboxes, scores, cls):
+    import pyzed.sl as sl
     output = []
     for i, bbox in enumerate(bboxes):
         # print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
@@ -218,29 +210,44 @@ def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBo
         output.append(obj)
     return output
 
-def image_demo(predictor, vis_folder, path, current_time, save_result):
-    if os.path.isdir(path):
-        files = get_image_list(path)
-    else:
-        files = [path]
-    files.sort()
-    for image_name in files:
-        outputs, img_info = predictor.inference(image_name)
-        result_image = predictor.visual(outputs[0], img_info, predictor.confthre)
-        if save_result:
-            save_folder = os.path.join(
-                vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
-            )
-            os.makedirs(save_folder, exist_ok=True)
-            save_file_name = os.path.join(save_folder, os.path.basename(image_name))
-            logger.info("Saving detection result in {}".format(save_file_name))
-            cv2.imwrite(save_file_name, result_image)
-        ch = cv2.waitKey(0)
-        if ch == 27 or ch == ord("q") or ch == ord("Q"):
+def imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args):
+    cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
+    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
+    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    if args.save_result:
+        save_folder = os.path.join(
+            vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
+        )
+        os.makedirs(save_folder, exist_ok=True)
+        if args.demo == "video":
+            save_path = os.path.join(save_folder, os.path.basename(args.path))
+        else:
+            save_path = os.path.join(save_folder, "camera.mp4")
+        logger.info(f"video save_path is {save_path}")
+        vid_writer = cv2.VideoWriter(
+            save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
+        )
+    while True:
+        ret_val, frame = cap.read()
+        if ret_val:
+            outputs, img_info = predictor.inference(frame)
+            result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
+            if args.save_result:
+                vid_writer.write(result_frame)
+            else:
+                cv2.namedWindow("yolox", cv2.WINDOW_NORMAL)
+                cv2.imshow("yolox", result_frame)
+            ch = cv2.waitKey(1)
+            if ch == 27 or ch == ord("q") or ch == ord("Q"):
+                break
+        else:
             break
 
-
-def imageflow_demo(predictor, vis_folder, current_time, args):
+def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
+    import pyzed.sl as sl
+    import ogl_viewer.viewer as gl
+    import cv_viewer.tracking_viewer as cv_viewer
     view_gl = True
     view_cv = True
     # Edit here
@@ -453,9 +460,14 @@ def main(exp, args):
     )
     current_time = time.localtime()
     if args.demo == "image":
-        image_demo(predictor, vis_folder, args.path, current_time, args.save_result)
-    elif args.demo == "video" or args.demo == "webcam":
-        imageflow_demo(predictor, vis_folder, current_time, args)
+        print("remove image option for simplification")
+    elif args.demo not in ("video", "webcam"):
+        exit()
+
+    if args.as_USB:
+        imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args)
+    else:
+        imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args)
 
 
 if __name__ == "__main__":
