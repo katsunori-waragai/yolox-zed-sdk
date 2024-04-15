@@ -120,6 +120,39 @@ index b16598d..dc89d8d 100644
              result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
 ```
 
+## YOLOXでの結果をZED SDK で３D表示させる
+-  tools/demo_zed.py
+### opengl を無効化した状況では動作している。
+- Dockerfileを用いて環境構築を実施した
+
+```
+xhost +
+sh docker_build.sh
+sh docker_run.sh
+
+cd /root/yolox-zed-sdk
+cd tools
+sh webcam_zed.sh
+
+```
+- この状況では、OpenGLを有効化していないので、エラー無しで動作する。
+
+### errorを再現する状況
+- 次に
+tools/demo_zed.py を改変すると
+```
+-    view_gl = False
++    view_gl = True
+```
+以下のエラーを生じてしまう。
+ ERROR: Internal error <FBConfig with necessary capabilities not found> in function fgOpenWindow
+
+- エラーの解決策をまだ見つけられていない。
+
+
+host環境のOpenGL
+- PyOpenGL 3.1.7
+- PyOpenGL-accelerate 3.1.7
 
 ## TensorRT対応
 ### 情報源
