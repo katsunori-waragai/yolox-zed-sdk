@@ -453,7 +453,7 @@ def main(exp, args):
     )
     current_time = time.localtime()
     if args.demo == "image":
-        image_demo(predictor, vis_folder, args.path, current_time, args.save_result)
+        print("remove image option for simplification")
     elif args.demo == "video" or args.demo == "webcam":
         imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args)
 
