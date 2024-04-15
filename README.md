@@ -17,9 +17,12 @@ $ bash docker_run.sh
 ```
 
 ### toolsにあるスクリプト
-tools/demo.py       USBカメラを用いたyolox での物体検出
-tools/demo_zed.py 　ZEDカメラを用いたyolox での物体検出(検出結果をZED SDKに戻して３D表示させようとしている。)
-tools/detector.py   ZEDカメラを用いたyolox での物体検出(画像取得だけZED SDKを利用)
+- tools/demo.py       USBカメラを用いたyolox での物体検出
+- tools/demo_zed.py 　ZEDカメラを用いたyolox での物体検出(検出結果をZED SDKに戻して３D表示させようとしている。)
+- tools/detector.py   ZEDカメラを用いたyolox での物体検出(画像取得だけZED SDKを利用)
+
+上記のスクリプトのうち、tools/demo_zed.pyがopenglでの3D表示付きで表示できれば、このリポジトリでの目的は達成である。
+
 
 ### tools/demo.py の使い方
 
