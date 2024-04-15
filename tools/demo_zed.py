@@ -86,6 +86,13 @@ def make_parser():
         action="store_true",
         help="Using TensorRT model for testing.",
     )
+    parser.add_argument(
+        "--as_USB",
+        default=False,
+        action="store_true",
+        help="camera as USB Camera",
+    )
+
     return parser
 
 
@@ -454,7 +461,12 @@ def main(exp, args):
     current_time = time.localtime()
     if args.demo == "image":
         print("remove image option for simplification")
-    elif args.demo == "video" or args.demo == "webcam":
+    elif args.demo not in ("video", "webcam"):
+        exit()
+
+    if args.as_USB:
+        imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args)
+    else:
         imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args)
 
 
