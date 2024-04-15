@@ -241,7 +241,7 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
 
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
-    view_gl = True
+    view_gl = False
     view_cv = True
     # Edit here
     zed = sl.Camera()
