@@ -154,7 +154,7 @@ class Predictor(object):
             logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
 
-    def visual(self, output, img_info, cls_conf=0.35):
+    def _parse(self, output, img_info):
         ratio = img_info["ratio"]
         img = img_info["raw_img"]
         if output is None:
@@ -168,8 +168,16 @@ class Predictor(object):
 
         cls = output[:, 6]
         scores = output[:, 4] * output[:, 5]
+        return img, bboxes, scores, cls
 
+    def visual(self, output, img_info, cls_conf=0.35):
+        """
+        
+        """
+
+        img, bboxes, scores, cls = self._parse(output, img_info)
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
+        assert vis_res.shape == img.shape
         return vis_res
 
 
