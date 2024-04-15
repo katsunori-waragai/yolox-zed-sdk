@@ -1,3 +1,2 @@
 #/bin/bash
-sudo docker build -t yolox:100 .
-  
+sudo docker build -t yolox-zed:100 .

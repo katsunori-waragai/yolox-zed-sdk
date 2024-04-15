@@ -19,7 +19,7 @@ $ bash docker_run.sh
 ### tools/demo.py の使い方
 
 ```
-root@waragai-orin:~/YOLOX# python3 tools/demo.py -h
+root@orin:~/YOLOX# python3 tools/demo.py -h
 usage: YOLOX Demo! [-h] [-expn EXPERIMENT_NAME] [-n NAME] [--path PATH] [--camid CAMID] [--save_result] [-f EXP_FILE] [-c CKPT]
                    [--device DEVICE] [--conf CONF] [--nms NMS] [--tsize TSIZE] [--fp16] [--legacy] [--fuse] [--trt]
                    demo
@@ -45,7 +45,7 @@ optional arguments:
   --legacy              To be compatible with older versions
   --fuse                Fuse conv and bn for testing.
   --trt                 Using TensorRT model for testing.
-root@waragai-orin:~/YOLOX#
+root@orin:~/YOLOX#
 
 ```
 
@@ -74,18 +74,18 @@ $ xhost +
 python3 tools/demo.py video -n yolox-s -c ./yolox_s.pth --path [VIDEOFILE] --conf 0.25 --nms 0.45 --tsize 640 --save_result --device gpu
 ```
 
-root@waragai-orin:~/YOLOX# python3 tools/demo.py video -n yolox-s -c ./yolox_s.pth --path yolox-docker/rXzxjn-sN9M.mp4 --conf 0.25 --nms 0.45 --tsize 640  --device gpu
+root@orin:~/YOLOX# python3 tools/demo.py video -n yolox-s -c ./yolox_s.pth --path yolox-docker/rXzxjn-sN9M.mp4 --conf 0.25 --nms 0.45 --tsize 640  --device gpu
 
 pip install "opencv-python<=3.4.18.65"
 
 ```
-root@waragai-orin:~/YOLOX# python3 tools/demo.py video -n yolox-s -c ./yolox_s.pth --path [VIDEOFILE] --conf 0.25 --nms 0.45 --tsize 640 --save_result --device gpu
-root@waragai-orin:~/YOLOX# python3 tools/demo.py video -n yolox-s -c ./yolox_s.pth --path yolox-docker/rXzxjn-sN9M.mp4 --conf 0.25 --nms 0.45 --tsize 640  --device gpu
+root@orin:~/YOLOX# python3 tools/demo.py video -n yolox-s -c ./yolox_s.pth --path [VIDEOFILE] --conf 0.25 --nms 0.45 --tsize 640 --save_result --device gpu
+root@orin:~/YOLOX# python3 tools/demo.py video -n yolox-s -c ./yolox_s.pth --path yolox-docker/rXzxjn-sN9M.mp4 --conf 0.25 --nms 0.45 --tsize 640  --device gpu
 ```
 
 ### webcam example
 ```
-root@waragai-orin:~/YOLOX# python3 tools/demo.py webcam -n yolox-s -c ./yolox_s.pth --camid 0 --conf 0.25 --nms 0.45  --device gpu
+root@orin:~/YOLOX# python3 tools/demo.py webcam -n yolox-s -c ./yolox_s.pth --camid 0 --conf 0.25 --nms 0.45  --device gpu
 ```
 
 ### ZED2i の場合
@@ -96,7 +96,7 @@ root@waragai-orin:~/YOLOX# python3 tools/demo.py webcam -n yolox-s -c ./yolox_s.
 - 省くと、検出結果が得られなくなる。
 
 ```commandline
-root@waragai-orin:~/YOLOX# git diff tools/demo.py 
+root@orin:~/YOLOX# git diff tools/demo.py 
 diff --git a/tools/demo.py b/tools/demo.py
 index b16598d..dc89d8d 100644
 --- a/tools/demo.py
@@ -147,7 +147,7 @@ bash prepare.sh
 2024-01-24 03:28:16.051 | INFO     | __main__:main:79 - Converted TensorRT model engine file is saved for C++ inference.
 
 ## TensorRTに変換済みのファイルが置かれる場所
-root@waragai-orin:~/YOLOX# ls -lF YOLOX_outputs/yolox_s/
+root@orin:~/YOLOX# ls -lF YOLOX_outputs/yolox_s/
 total 48932
 -rw-r--r-- 1 root root 20431374 Jan 24 03:28 model_trt.engine
 -rw-r--r-- 1 root root 29663539 Jan 24 03:28 model_trt.pth
@@ -163,7 +163,7 @@ drwxr-xr-x 3 root root     4096 Jan 24 04:20 vis_res/
 
 # python3 tools/demo.py video -n yolox-s --trt --save_result --path /root/yolox/yolox_data/rXzxjn-sN9M.mp4 --conf 0.25 --nms 0.45 --tsize 640 --device gpu
 
-root@waragai-orin:~/YOLOX# python3 tools/demo.py video -n yolox-tiny --trt --path yolox-docker/rXzxjn-sN9M.mp4 --conf 0.25 --nms 0.45  --device gpu
+root@orin:~/YOLOX# python3 tools/demo.py video -n yolox-tiny --trt --path yolox-docker/rXzxjn-sN9M.mp4 --conf 0.25 --nms 0.45  --device gpu
 
 
 ```
