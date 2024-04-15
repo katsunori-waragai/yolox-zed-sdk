@@ -203,7 +203,7 @@ def yolox_detections_to_custom_box(img, bboxes, scores, cls):
         output.append(obj)
     return output
 
-def imageflow_demo(predictor, vis_folder, current_time, args):
+def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
     import pyzed.sl as sl
     import ogl_viewer.viewer as gl
     import cv_viewer.tracking_viewer as cv_viewer
@@ -421,7 +421,7 @@ def main(exp, args):
     if args.demo == "image":
         image_demo(predictor, vis_folder, args.path, current_time, args.save_result)
     elif args.demo == "video" or args.demo == "webcam":
-        imageflow_demo(predictor, vis_folder, current_time, args)
+        imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args)
 
 
 if __name__ == "__main__":
