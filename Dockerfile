@@ -8,7 +8,7 @@ RUN apt-get install -y libv4l-dev v4l-utils qv4l2
 RUN apt-get install -y curl
 RUN apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 RUN apt-get install -y tensorrt nvidia-tensorrt-dev python3-libnvinfer-dev
-RUN apt-get install -y libGLdispatch
+# RUN apt-get install -y libGLdispatch
 RUN python3 -m pip install -U pip
 RUN python3 -m pip install loguru tqdm thop ninja tabulate
 RUN python3 -m pip install pycocotools
