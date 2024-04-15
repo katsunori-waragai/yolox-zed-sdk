@@ -22,11 +22,6 @@ from yolox.utils import fuse_model, get_model_info, postprocess, vis
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 
 
-import pyzed.sl as sl
-
-import ogl_viewer.viewer as gl
-import cv_viewer.tracking_viewer as cv_viewer
-
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
     parser.add_argument(
@@ -189,7 +184,8 @@ class Predictor(object):
         return vis_res
 
 
-def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBoxObjectData]:
+def yolox_detections_to_custom_box(img, bboxes, scores, cls):
+    import pyzed.sl as sl
     output = []
     for i, bbox in enumerate(bboxes):
         # print(f"{i} {bbox}")  # xmin, ymin, xmax, ymax
@@ -208,6 +204,9 @@ def yolox_detections_to_custom_box(img, bboxes, scores, cls) -> List[sl.CustomBo
     return output
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
+    import pyzed.sl as sl
+    import ogl_viewer.viewer as gl
+    import cv_viewer.tracking_viewer as cv_viewer
     view_gl = True
     view_cv = True
     # Edit here

@@ -5,9 +5,12 @@
 import argparse
 import os
 import time
+from typing import List
+
 from loguru import logger
 
 import cv2
+import numpy as np
 
 import torch
 
