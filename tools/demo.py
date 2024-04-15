@@ -86,17 +86,6 @@ def make_parser():
     return parser
 
 
-def get_image_list(path):
-    image_names = []
-    for maindir, subdir, file_name_list in os.walk(path):
-        for filename in file_name_list:
-            apath = os.path.join(maindir, filename)
-            ext = os.path.splitext(apath)[1]
-            if ext in IMAGE_EXT:
-                image_names.append(apath)
-    return image_names
-
-
 class Predictor(object):
     def __init__(
         self,
@@ -182,28 +171,6 @@ class Predictor(object):
 
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
         return vis_res
-
-
-def image_demo(predictor, vis_folder, path, current_time, save_result):
-    if os.path.isdir(path):
-        files = get_image_list(path)
-    else:
-        files = [path]
-    files.sort()
-    for image_name in files:
-        outputs, img_info = predictor.inference(image_name)
-        result_image = predictor.visual(outputs[0], img_info, predictor.confthre)
-        if save_result:
-            save_folder = os.path.join(
-                vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
-            )
-            os.makedirs(save_folder, exist_ok=True)
-            save_file_name = os.path.join(save_folder, os.path.basename(image_name))
-            logger.info("Saving detection result in {}".format(save_file_name))
-            cv2.imwrite(save_file_name, result_image)
-        ch = cv2.waitKey(0)
-        if ch == 27 or ch == ord("q") or ch == ord("Q"):
-            break
 
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
