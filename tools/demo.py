@@ -184,7 +184,7 @@ class Predictor(object):
         return vis_res
 
 
-def imageflow_demo(predictor, vis_folder, current_time, args):
+def imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args):
     cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
@@ -288,7 +288,7 @@ def main(exp, args):
     if args.demo == "image":
         image_demo(predictor, vis_folder, args.path, current_time, args.save_result)
     elif args.demo == "video" or args.demo == "webcam":
-        imageflow_demo(predictor, vis_folder, current_time, args)
+        imageflow_demo_USB_CAM(predictor, vis_folder, current_time, args)
 
 
 if __name__ == "__main__":
