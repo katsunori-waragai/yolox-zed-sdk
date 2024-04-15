@@ -93,18 +93,6 @@ def make_parser():
     )
     return parser
 
-
-def get_image_list(path):
-    image_names = []
-    for maindir, subdir, file_name_list in os.walk(path):
-        for filename in file_name_list:
-            apath = os.path.join(maindir, filename)
-            ext = os.path.splitext(apath)[1]
-            if ext in IMAGE_EXT:
-                image_names.append(apath)
-    return image_names
-
-
 class Predictor(object):
     def __init__(
         self,
