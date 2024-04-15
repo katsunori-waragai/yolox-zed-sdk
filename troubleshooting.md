@@ -1,3 +1,4 @@
+# 解決済みのtrouble
 # webm file case
 OpenCV: FFMPEG: tag 0x7634706d/'mp4v' is not supported with codec id 12 and format 'webm / WebM'
 
