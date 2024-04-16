@@ -8,7 +8,7 @@ glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 ```
 https://ubuntuforums.org/archive/index.php/t-1379495.html
 
-統合環境によっては、参照できない変数にwarningが生じるので、それを見落とさ兄事。
+統合環境によっては、参照できない変数にwarningが生じるので、それを見落とさないこと。
 
 
 ### glutInit()の謎
