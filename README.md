@@ -27,6 +27,8 @@ $ bash docker_run.sh
 - tools/demo_zed.py 　ZEDカメラを用いたyolox での物体検出(検出結果をZED SDKに戻して３D表示させようとしている。)
 上記のスクリプトのうち、tools/demo_zed.pyがopenglでの3D表示付きで表示できれば、このリポジトリでの目的は達成である。
 
+- tensorRT化したモデルでの物体検出の推論は10ms前後。
+- tensorRT化前は30ms前後。
 
 ### tools/demo_zed.py の使い方
 
@@ -63,21 +65,6 @@ optional arguments:
 root@orin:~/YOLOX#
 
 ```
-### opengl を無効化した状況では動作している。
-- Dockerfileを用いて環境構築を実施した
-
-```
-xhost +
-sh docker_build.sh
-sh docker_run.sh
-
-cd /root/yolox-zed-sdk
-cd tools
-sh webcam_zed.sh
-
-```
-- この状況では、OpenGLを有効化していないので、エラー無しで動作する。
-
 ### errorを再現する状況
 - 次に
 tools/demo_zed.py を改変すると
