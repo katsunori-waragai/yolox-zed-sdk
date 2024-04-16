@@ -251,7 +251,7 @@ def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
     import pyzed.sl as sl
     import ogl_viewer.viewer as gl
     import cv_viewer.tracking_viewer as cv_viewer
-    view_gl = True
+    view_gl = False
     view_cv = True
     # Edit here
     zed = sl.Camera()
