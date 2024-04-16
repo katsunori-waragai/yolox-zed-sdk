@@ -6,6 +6,7 @@ import argparse
 import os
 import time
 from typing import List
+from pathlib import Path
 
 from loguru import logger
 
@@ -21,6 +22,8 @@ from yolox.utils import fuse_model, get_model_info, postprocess, vis
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
@@ -392,6 +395,9 @@ def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
         else:
             break
 
+def find_trt():
+    names = list(REPO_ROOT.glob("**/model_trt.pth"))
+    return names[0] if names else None
 
 def main(exp, args):
     if not args.experiment_name:
@@ -444,6 +450,7 @@ def main(exp, args):
     if args.trt:
         assert not args.fuse, "TensorRT model is not support model fusing!"
         trt_file = os.path.join(file_name, "model_trt.pth")
+        trt_file = find_trt()
         assert os.path.exists(
             trt_file
         ), "TensorRT model is not found!\n Run python3 tools/trt.py first!"
