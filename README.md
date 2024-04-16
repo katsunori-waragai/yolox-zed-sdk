@@ -118,6 +118,10 @@ drwxr-xr-x 3 root root     4096 Jan 24 04:20 vis_res/
 - docker_run.sh の中で設定するvolume のマウントポイントにYOLOX_outputs/を追加した。
   - このことで、各実行時のYOLOX_outputs/ディレクトリを永続化した。
 
+### Docker環境で利用したZED SDK のインストーラー
+https://download.stereolabs.com/zedsdk/4.1/l4t35.3/jetsons
+で入手できます。
+入手の手順、インストール手順はDockerfile に記述してあります。
 ## SEE ALSO
 [Jetson Xavier AGXでYOLOXを動かす　ちょっとだけベンチマーク](https://qiita.com/sowd0726/items/bd916f712946961a7432)
 
