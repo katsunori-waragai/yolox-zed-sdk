@@ -341,24 +341,11 @@ def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
         # ret_val, frame = cap.read()
         if frame is not None:
             outputs, img_info = predictor.inference(bgr)
-            # print(f"{outputs=}")
-            # print(f"{outputs[0]=}")  # tensor
-            # print(f"{img_info=}")
-            # print(f"{img_info.keys()=}")
             """
             img_info.keys()=dict_keys(['id', 'file_name', 'height', 'width', 'raw_img', 'ratio'])
             """
-            result_frame = predictor.visual(outputs[0], img_info, predictor.confthre)
-            # print(f"{outputs=}")
             img, bboxes, scores, cls = predictor._parse(outputs[0], img_info)
             detections = yolox_detections_to_custom_box(img, bboxes, scores, cls)
-            print(f"{predictor.num_classes}")
-            # print(f"{detections=}")
-            """
-            [2024-04-10 07:13:23 UTC][ZED][WARNING] Camera::ingestCustomBoxObjects: Invalid instance_id value
-            [2024-04-10 07:13:23 UTC][ZED][WARNING] INVALID FUNCTION CALL in sl::ERROR_CODE sl::Camera::ingestCustomBoxObjects(std::vector<sl::CustomBoxObjectData>&, unsigned int)
-            [2024-04-10 07:13:23 UTC][ZED][WARNING] INVALID FUNCTION CALL in sl::ERROR_CODE sl::Camera::retrieveObjects(sl::Objects&, sl::ObjectDetectionRuntimeParameters, unsigned int)
-            """
             zed.ingest_custom_box_objects(detections)
             zed.retrieve_objects(objects, obj_runtime_param)
             show_retrieved = False
@@ -386,11 +373,9 @@ def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
                 track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
 
             if args.save_result:
-                vid_writer.write(result_frame)
+                vid_writer.write(global_image)
             else:
                 cv2.imshow("ZED | 2D View and Birds View", global_image)
-                cv2.namedWindow("yolox", cv2.WINDOW_NORMAL)
-                cv2.imshow("yolox", result_frame)
             ch = cv2.waitKey(1)
             if ch == 27 or ch == ord("q") or ch == ord("Q"):
                 break
