@@ -352,6 +352,7 @@ def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
             # print(f"{outputs=}")
             img, bboxes, scores, cls = predictor._parse(outputs[0], img_info)
             detections = yolox_detections_to_custom_box(img, bboxes, scores, cls)
+            print(f"{predictor.num_classes}")
             # print(f"{detections=}")
             """
             [2024-04-10 07:13:23 UTC][ZED][WARNING] Camera::ingestCustomBoxObjects: Invalid instance_id value
@@ -377,7 +378,8 @@ def imageflow_demo_ZED_CAM(predictor, vis_folder, current_time, args):
                 viewer.updateData(point_cloud_render, objects)
             # 2D rendering
             np.copyto(image_left_ocv, image_left.get_data())
-            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking)
+            class_names = predictor.cls_names
+            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking, class_names)
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
             # Tracking view
             if view_cv:
