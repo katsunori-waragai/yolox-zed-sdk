@@ -1,8 +1,5 @@
 # yolox-zed-sdk
-docker environment for YOLOX on Jetson AGX Orin with ZED SDK
-
-- Pytorchを含むJetson 用のDockerImage を用いて、 ZED SDK を利用できる環境を提供する。
-- ZED SDK によるデータ取得を用いて、その環境内でyoloxによる物体検出を実行する。
+YOLOX binding with ZED SDK
 
 ## requirement
 - StereoLabs ZED2i camera
@@ -20,14 +17,15 @@ $ bash docker_run.sh
 # bash webcam_zed.sh
 ```
 
-### toolsにあるスクリプト
-- tools/webcam_as_usb.sh　# ZED2iをUSBカメラとして使用する検出スクリプト
-- tools/webcam_zed.sh  # ZED2iをZED SDKの枠組みで使用する検出スクリプト
-- tools/demo_zed.py 　ZEDカメラを用いたyolox での物体検出(検出結果をZED SDKに戻して３D表示させようとしている。)
-上記のスクリプトのうち、tools/demo_zed.pyがopenglでの3D表示付きで表示できれば、このリポジトリでの目的は達成である。
+### Script in tools
+- tools/webcam_as_usb.sh # Detector script to use ZED2i as USB camera
+- tools/webcam_zed.sh # Detector script to use ZED2i in the framework of ZED SDK
+- tools/demo_zed.py Object detection in yolox using ZED camera (trying to send detection results back to ZED SDK for 3D display)
 
-- tensorRT化したモデルでの物体検出の推論は10ms前後。
-- tensorRT化前は30ms前後。
+- The inference time for object detection
+  - tensorRT model: around 10ms.
+  - pyTorch model: about 30ms.
+
 
 #### 利用例
 bash webcam_as_usb.sh
@@ -71,25 +69,19 @@ root@orin:~/YOLOX#
 
 ```
 ### errorを再現する状況
-- 次に
-tools/demo_zed.py を改変すると
+- If you modify tools/demo_zed.py.
+````
+- view_gl = False
++ view_gl = True
 ```
--    view_gl = False
-+    view_gl = True
-```
-以下のエラーを生じてしまう。
+I get the following error
  ERROR: Internal error <FBConfig with necessary capabilities not found> in function fgOpenWindow
 
-- エラーの解決策をまだ見つけられていない。
+- I have not found a solution to the error yet.
 
-
-host環境のOpenGL
-- PyOpenGL 3.1.7
-- PyOpenGL-accelerate 3.1.7
-
-## TensorRT対応
-### 情報源
-  - YOLOX の公式サイトによるTensorRT化のdeploy 方法
+## TensorRT Support
+### Sources.
+  - How to deploy TensorRT by YOLOX official site
   https://github.com/Megvii-BaseDetection/YOLOX/tree/main/demo/TensorRT/python
 
   https://yolox.readthedocs.io/en/latest/demo/trt_py_readme.html
