@@ -1,7 +1,8 @@
 #!/bin/sh
-# torch2trt
 cd /root
-git clone https://github.com/NVIDIA-AI-IOT/torch2trt ; cd torch2trt; python3 setup.py install
+if [ ! -d torch2trt ]; then
+  git clone https://github.com/NVIDIA-AI-IOT/torch2trt ; cd torch2trt; python3 setup.py install
+fi
 
 export PROJECT_HOME=/root/yolox-zed-sdk
 export YOLOX_HOME=/root/YOLOX
@@ -17,5 +18,5 @@ else
 fi
 
 mkdir --parents ${PROJECT_HOME}//YOLOX_outputs/yolox_s
-cp -r ${YOLOX_HOME}/YOLOX_outputs/yolox_s/ ${PROJECT_HOME}//YOLOX_outputs/yolox_s
+cp -r ${YOLOX_HOME}/YOLOX_outputs/yolox_s/ ${PROJECT_HOME}/YOLOX_outputs/yolox_s
 
