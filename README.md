@@ -30,6 +30,12 @@ $ bash docker_run.sh
 - tensorRT化したモデルでの物体検出の推論は10ms前後。
 - tensorRT化前は30ms前後。
 
+#### 利用例
+bash webcam_as_usb.sh
+![](figures/webcam_as_usb.png)
+bash webcam_zed.sh 
+![](figures/webcam_zed.png)
+
 ### tools/demo_zed.py の使い方
 
 ```
