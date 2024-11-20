@@ -69,21 +69,15 @@ root@orin:~/YOLOX#
 
 ```
 ### errorを再現する状況
-- 次に
-tools/demo_zed.py を改変すると
+- If you modify tools/demo_zed.py.
+````
+- view_gl = False
++ view_gl = True
 ```
--    view_gl = False
-+    view_gl = True
-```
-以下のエラーを生じてしまう。
+I get the following error
  ERROR: Internal error <FBConfig with necessary capabilities not found> in function fgOpenWindow
 
-- エラーの解決策をまだ見つけられていない。
-
-
-host環境のOpenGL
-- PyOpenGL 3.1.7
-- PyOpenGL-accelerate 3.1.7
+- I have not found a solution to the error yet.
 
 ## TensorRT対応
 ### 情報源
