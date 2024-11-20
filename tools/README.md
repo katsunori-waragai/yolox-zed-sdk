@@ -1,14 +1,8 @@
-# yolox/tools 由来のスクリプトとpytorch_yoloxv8 由来のライブラリ
-- cv_viewer
-- ogl_viewer 
-はpytorch_yolov8 由来の描画ライブラリ
-
-# demo.py
-- yolox 由来のスクリプト。入力はUSBカメラ
+# yolox/tools-derived scripts and pytorch_yoloxv8-derived library
+- cv_viewer/
+- ogl_viewer/ 
+is a drawing library derived from pytorch_yolov8
 
 # demo_zed.py
-- pytorch_yolov8 由来のスクリプトを検出をylolox に変更したスクリプト。
-- pytorch_yolov8のもつ２つのviewerを利用している。
-
-# detector.py
-- demo.py を利用して、入力をZED2i に変更したスクリプト。
+- Script derived from pytorch_yolov8 with detection changed to yolox.
+- It uses two viewers from pytorch_yolov8.
