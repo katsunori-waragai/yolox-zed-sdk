@@ -39,5 +39,5 @@ RUN cd /root/YOLOX && wget https://github.com/Megvii-BaseDetection/YOLOX/release
 
 # torch2trt
 RUN cd /root/ && git clone https://github.com/NVIDIA-AI-IOT/torch2trt ;
-# RUN cd /root/torch2trt; python3 setup.py install
+RUN cd /root/torch2trt; python3 setup.py install
 # RUN cd /root/YOLOX && python3 tools/trt.py -n yolox-s -c yolox_s.pth
