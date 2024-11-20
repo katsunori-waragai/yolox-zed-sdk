@@ -10,18 +10,13 @@ RUN apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 RUN apt-get install -y tensorrt nvidia-tensorrt-dev python3-libnvinfer-dev
 # RUN apt-get install -y libGLdispatch
 RUN python3 -m pip install -U pip
-RUN python3 -m pip install loguru tqdm thop ninja tabulate
-RUN python3 -m pip install pycocotools
+RUN python3 -m pip install -r requirements.txt
 
-RUN python3 -m pip install ultralytics
-RUN python3 -m pip install opencv-python==3.4.18.65
-RUN python3 -m pip install PyOpenGL
-RUN python3 -m pip install PyOpenGL-accelerate
-
-RUN wget -O ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run https://download.stereolabs.com/zedsdk/4.1/l4t35.2/jetsons
-RUN chmod +x ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run
+ENV ZED_SDK_INSTALLER=ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run
+RUN wget -O ${ZED_SDK_INSTALLER} https://download.stereolabs.com/zedsdk/4.1/l4t35.2/jetsons
+RUN chmod +x ${ZED_SDK_INSTALLER}
 RUN apt install zstd
-RUN ./ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run -- silent
+RUN ./${ZED_SDK_INSTALLER} -- silent
 
 
 RUN cd /root && git clone https://github.com/Megvii-BaseDetection/YOLOX.git
