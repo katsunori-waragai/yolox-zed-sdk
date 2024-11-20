@@ -32,9 +32,9 @@ $ bash docker_run.sh
 
 #### 利用例
 bash webcam_as_usb.sh
-![](figures/webcam_as_usb.png)
+![](tools/figures/webcam_as_usb.png)
 bash webcam_zed.sh 
-![](figures/webcam_zed.png)
+![](tools/figures/webcam_zed.png)
 
 ### tools/demo_zed.py の使い方
 
