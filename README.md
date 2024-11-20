@@ -79,9 +79,9 @@ I get the following error
 
 - I have not found a solution to the error yet.
 
-## TensorRT対応
-### 情報源
-  - YOLOX の公式サイトによるTensorRT化のdeploy 方法
+## TensorRT Support
+### Sources.
+  - How to deploy TensorRT by YOLOX official site
   https://github.com/Megvii-BaseDetection/YOLOX/tree/main/demo/TensorRT/python
 
   https://yolox.readthedocs.io/en/latest/demo/trt_py_readme.html
