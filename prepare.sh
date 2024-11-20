@@ -1,11 +1,4 @@
 #!/bin/sh
-cd /root
-if [ ! -d torch2trt ]; then
-  git clone https://github.com/NVIDIA-AI-IOT/torch2trt ; cd torch2trt; python3 setup.py install
-else
-  echo "skipped install torch2trt. already exists."
-fi
-
 export PROJECT_HOME=/root/yolox-zed-sdk
 export YOLOX_HOME=/root/YOLOX
 cd ${YOLOX_HOME}
