@@ -1,6 +1,7 @@
 # ZED SDK - Object Detection
+YOLOX binding with ZED SDK
 
-This sample shows how to detect custom objects using the official Pytorch implementation of YOLOv8 from a ZED camera and ingest them into the ZED SDK to extract 3D informations and tracking for each objects.
+This sample shows how to detect custom objects using the official Pytorch implementation of YOLOX from a ZED camera and ingest them into the ZED SDK to extract 3D informations and tracking for each objects.
 
 ## Getting Started
 
@@ -15,10 +16,36 @@ This sample shows how to detect custom objects using the official Pytorch implem
 pip install ultralytics
 ```
 
-## Run the program
-bash webcam_zed.sh
+## Setting up with docker
 
+```
+$ bash docker_build.sh
+$ bash docker_run.sh
+# cd /root/yolox-zed-sdk/pytorch_yolox
+```
+
+## Run the program
+- webcam_as_usb.sh # Detector script to use ZED2i as USB camera
+- webcam_zed.sh # Detector script to use ZED2i in the framework of ZED SDK
+- demo_zed.py Object detection in yolox using ZED camera (trying to send detection results back to ZED SDK for 3D display)
+
+- The inference time for object detection
+  - tensorRT model: around 10ms.
+  - pyTorch model: about 30ms.
+
+```commandline
+bash prepare.sh
+```
+```commandline
+bash webcam_zed.sh
+```
+![](figures/webcam_as_usb.png)
+
+```commandline
 bash webcam_as_usb.sh
+```
+![](figures/webcam_zed.png)
+
 
 # yolox/tools-derived scripts and pytorch_yoloxv8-derived library
 - cv_viewer/
