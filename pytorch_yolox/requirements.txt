@@ -8,3 +8,4 @@ tabulate
 thop
 tqdm
 ultralytics
+-e git+https://github.com/NVIDIA-AI-IOT/torch2trt.git#egg=torch2trt-0.5.0
