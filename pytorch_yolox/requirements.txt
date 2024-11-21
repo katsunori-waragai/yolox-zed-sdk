@@ -1,0 +1,10 @@
+loguru
+ninja
+opencv-python==3.4.18.65
+pycocotools
+PyOpenGL
+PyOpenGL-accelerate
+tabulate
+thop
+tqdm
+ultralytics
