@@ -10,13 +10,8 @@ RUN apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 RUN apt-get install -y tensorrt nvidia-tensorrt-dev python3-libnvinfer-dev
 # RUN apt-get install -y libGLdispatch
 RUN python3 -m pip install -U pip
-RUN python3 -m pip install loguru tqdm thop ninja tabulate
-RUN python3 -m pip install pycocotools
-
-RUN python3 -m pip install ultralytics
-RUN python3 -m pip install opencv-python==3.4.18.65
-RUN python3 -m pip install PyOpenGL
-RUN python3 -m pip install PyOpenGL-accelerate
+COPY ./requirements.txt /root/
+RUN python3 -m pip install -r /root/requirements.txt
 
 ENV ZED_SDK_INSTALLER=ZED_SDK_Tegra_L4T35.2_v4.2.2.zstd.run
 RUN wget -O ${ZED_SDK_INSTALLER} https://download.stereolabs.com/zedsdk/4.2/l4t35.2/jetsons
