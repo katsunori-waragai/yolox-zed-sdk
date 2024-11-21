@@ -1,5 +1,5 @@
 #!/bin/sh
-export PROJECT_HOME=/root/yolox-zed-sdk
+export BINDING_HOME=/root/yolox-zed-sdk/tools
 export YOLOX_HOME=/root/YOLOX
 cd ${YOLOX_HOME}
 if [ ! -f yolox_s.pth ]; then
@@ -12,6 +12,6 @@ else
   echo "skipped conversion by torch2trt. already exists."
 fi
 
-mkdir --parents ${PROJECT_HOME}//YOLOX_outputs/yolox_s
-cp -r ${YOLOX_HOME}/YOLOX_outputs/yolox_s/ ${PROJECT_HOME}/YOLOX_outputs/yolox_s
+mkdir --parents ${BINDING_HOME}//YOLOX_outputs/yolox_s
+cp -r ${YOLOX_HOME}/YOLOX_outputs/yolox_s/ ${BINDING_HOME}/YOLOX_outputs/yolox_s
 
