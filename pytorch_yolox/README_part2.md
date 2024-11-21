@@ -11,32 +11,35 @@ YOLOX binding with ZED SDK
 ```
 $ bash docker_build.sh
 $ bash docker_run.sh
-# cd /root/yolox-zed-sdk
-# make prepare
-# cd tools
+# cd /root/yolox-zed-sdk/pytorch_yolox
+# bash prepare.sh
 # bash webcam_zed.sh
 ```
 
-### Script in tools
-- tools/webcam_as_usb.sh # Detector script to use ZED2i as USB camera
-- tools/webcam_zed.sh # Detector script to use ZED2i in the framework of ZED SDK
-- tools/demo_zed.py Object detection in yolox using ZED camera (trying to send detection results back to ZED SDK for 3D display)
+### Scripts
+- webcam_as_usb.sh # Detector script to use ZED2i as USB camera
+- webcam_zed.sh # Detector script to use ZED2i in the framework of ZED SDK
+- demo_zed.py Object detection in yolox using ZED camera (trying to send detection results back to ZED SDK for 3D display)
 
 - The inference time for object detection
   - tensorRT model: around 10ms.
   - pyTorch model: about 30ms.
 
 
-#### 利用例
+#### examples
+```commandline
 bash webcam_as_usb.sh
+```
 ![](figures/webcam_as_usb.png)
+```commandline
 bash webcam_zed.sh 
+```
 ![](figures/webcam_zed.png)
 
-### tools/demo_zed.py の使い方
+### full usage of demo_zed.py
 
 ```
-root@orin:~/yolox-zed-sdk/tools# python3 demo_zed.py -h
+root@orin:~/yolox-zed-sdk/pytorch_yolox# python3 demo_zed.py -h
 usage: YOLOX Demo! [-h] [-expn EXPERIMENT_NAME] [-n NAME] [--path PATH] [--camid CAMID]
                    [--save_result] [-f EXP_FILE] [-c CKPT] [--device DEVICE] [--conf CONF]
                    [--nms NMS] [--tsize TSIZE] [--fp16] [--legacy] [--fuse] [--trt] [--as_USB]
@@ -68,8 +71,8 @@ optional arguments:
 root@orin:~/YOLOX#
 
 ```
-### errorを再現する状況
-- If you modify tools/demo_zed.py.
+### Trouble in `view_gl = True` Case
+- If you modify demo_zed.py.
 ````
 - view_gl = False
 + view_gl = True
