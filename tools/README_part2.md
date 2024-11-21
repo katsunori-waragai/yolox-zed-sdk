@@ -29,9 +29,9 @@ $ bash docker_run.sh
 
 #### 利用例
 bash webcam_as_usb.sh
-![](tools/figures/webcam_as_usb.png)
+![](figures/webcam_as_usb.png)
 bash webcam_zed.sh 
-![](tools/figures/webcam_zed.png)
+![](figures/webcam_zed.png)
 
 ### tools/demo_zed.py の使い方
 
@@ -111,9 +111,6 @@ total 48932
 -rw-r--r-- 1 root root 29663539 Jan 24 03:28 model_trt.pth
 drwxr-xr-x 3 root root     4096 Jan 24 04:20 vis_res/
 ```
-#### Docker 環境でのTRT化したモデルをDocker環境外に保存する方法
-- docker_run.sh の中で設定するvolume のマウントポイントにYOLOX_outputs/を追加した。
-  - このことで、各実行時のYOLOX_outputs/ディレクトリを永続化した。
 
 ## SEE ALSO
 [Jetson Xavier AGXでYOLOXを動かす　ちょっとだけベンチマーク](https://qiita.com/sowd0726/items/bd916f712946961a7432)
