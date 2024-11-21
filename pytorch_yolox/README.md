@@ -9,12 +9,12 @@ This sample shows how to detect custom objects using the official Pytorch implem
  - Check the [Documentation](https://www.stereolabs.com/docs/object-detection/custom-od/)
 
 ## Setting up
-
- - Install YOLOX
-
+ - Install python modules
 ```sh
-pip install ultralytics
+python3 -m pip install -r requirements.txt
 ```
+
+ - Install YOLOX, TensorRT
 
 ## Setting up with docker
 
