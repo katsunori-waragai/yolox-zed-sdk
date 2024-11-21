@@ -6,8 +6,12 @@ YOLOX binding with ZED SDK
 - NVIDIA Jetson AGX Orin
 
 #### examples
+```commandline
 bash webcam_as_usb.sh
-![](tools/figures/webcam_as_usb.png)
+```
+![](pytorch_yolox/figures/webcam_as_usb.png)
+```commandline
 bash webcam_zed.sh 
-![](tools/figures/webcam_zed.png)
+```
+![](pytorch_yolox/figures/webcam_zed.png)
 
