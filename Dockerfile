@@ -18,8 +18,8 @@ RUN python3 -m pip install opencv-python==3.4.18.65
 RUN python3 -m pip install PyOpenGL
 RUN python3 -m pip install PyOpenGL-accelerate
 
-ENV ZED_SDK_INSTALLER=ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run
-RUN wget -O ${ZED_SDK_INSTALLER} https://download.stereolabs.com/zedsdk/4.1/l4t35.2/jetsons
+ENV ZED_SDK_INSTALLER=ZED_SDK_Tegra_L4T35.2_v4.2.2.zstd.run
+RUN wget -O ${ZED_SDK_INSTALLER} https://download.stereolabs.com/zedsdk/4.2/l4t35.2/jetsons
 RUN chmod +x ${ZED_SDK_INSTALLER}
 RUN apt install zstd
 RUN ./${ZED_SDK_INSTALLER} -- silent
