@@ -10,7 +10,7 @@ RUN apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 RUN apt-get install -y tensorrt nvidia-tensorrt-dev python3-libnvinfer-dev
 # RUN apt-get install -y libGLdispatch
 RUN python3 -m pip install -U pip
-COPY requirements.txt /root/
+COPY tools/requirements.txt /root/
 RUN python3 -m pip install -r /root/requirements.txt
 
 ENV ZED_SDK_INSTALLER=ZED_SDK_Tegra_L4T35.3_v4.1.0.zstd.run
