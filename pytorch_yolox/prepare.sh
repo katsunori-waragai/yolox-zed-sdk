@@ -1,5 +1,5 @@
 #!/bin/sh
-export BINDING_HOME=/root/yolox-zed-sdk/tools
+export BINDING_HOME=/root/yolox-zed-sdk/pytorch_yolox
 export YOLOX_HOME=/root/YOLOX
 cd ${YOLOX_HOME}
 if [ ! -f yolox_s.pth ]; then
@@ -7,7 +7,7 @@ if [ ! -f yolox_s.pth ]; then
 fi
 export TRTMODEL_S=${YOLOX_HOME}/YOLOX_outputs/yolox_s/model_trt.pth
 if [ ! -f ${TRTMODEL_S} ]; then
-	python3 tools/trt.py -n yolox-s -c yolox_s.pth
+	python3 pytorch_yolox/trt.py -n yolox-s -c yolox_s.pth
 else
   echo "skipped conversion by torch2trt. already exists."
 fi
