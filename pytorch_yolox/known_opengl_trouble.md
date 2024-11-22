@@ -1,36 +1,10 @@
-OpenGL のエラーのうち、いくつかはこういった理由で生じる。
-
-```commandline
-error check 1
-error check 2
+### Errors 
 freeglut (demo_zed.py):  ERROR:  Internal error <FBConfig with necessary capabilities not found> in function fgOpenWindow
 Segmentation fault (core dumped)
 root@orin:~/yolox-zed-sdk/tools#
 ```
 
-## 理由１　引数の間違い
-```
-glutInitDisplayMode(GL_DOUBLE | GL_RGB | GL_DEPTH);
-...should be
-glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-```
-https://ubuntuforums.org/archive/index.php/t-1379495.html
-
-統合環境によっては、参照できない変数にwarningが生じるので、それを見落とさないこと。
-
-
-### glutInit()の謎
-なぜ、コマンドライン引数を必要とするのか？
-https://www.opengl.org/resources/libraries/glut/spec3/node10.html
-glutCreateWindow(文字列)は正しい。
-
-### export MESA_GL_VERSION_OVERRIDE=3.3
-- 謎の呪文 以下の行での異常終了が回避された。
-```commandline
-       viewer.init(camera_infos.camera_model, point_cloud_res, obj_param.enable_tracking)
-```
-
-### OpenGL の環境を確認するには
+### How to check the OpenGL environment
 ```commandline
 -----
 sudo glxinfo | grep OpenGL
@@ -52,8 +26,8 @@ OpenGL ES profile extensions:
 ```
 
 
-### Shaderがらみのエラー
-- 以下のshader関連のエラーは `export MESA_GL_VERSION_OVERRIDE=3.3` で回避された。
+### Shader-related errors
+- The following shader-related errors were avoided by `export MESA_GL_VERSION_OVERRIDE=3.3`.
 ```commandline
 [2024-04-15 08:30:11 UTC][ZED][INFO] [Init]  Calibration file downloaded.
 Traceback (most recent call last):
