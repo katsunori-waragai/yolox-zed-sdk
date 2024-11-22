@@ -31,5 +31,5 @@ RUN cd /root/YOLOX && wget https://github.com/Megvii-BaseDetection/YOLOX/release
 ENV CUDA_HOME="/usr/local/cuda"
 RUN cd /root/ && git clone https://github.com/NVIDIA-AI-IOT/torch2trt ;
 RUN echo ${CUDA_HOME}
-RUN cd /root/torch2trt; CUDA_HOME="/usr/local/cuda" python3 setup.py install
+RUN cd /root/torch2trt && python3 -m pip install .
 # RUN cd /root/YOLOX && python3 tools/trt.py -n yolox-s -c yolox_s.pth
