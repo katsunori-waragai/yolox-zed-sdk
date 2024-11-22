@@ -1,4 +1,5 @@
 FROM stereolabs/zed:4.2-py-devel-jetson-jp5.1.0
+
 RUN apt update
 RUN apt install sudo
 RUN apt-get install -y zip
@@ -27,6 +28,8 @@ RUN cd /root/YOLOX && python3 -m pip install -v -e .
 RUN cd /root/YOLOX && wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.pth
 
 # torch2trt
+ENV CUDA_HOME="/usr/local/cuda"
 RUN cd /root/ && git clone https://github.com/NVIDIA-AI-IOT/torch2trt ;
-RUN cd /root/torch2trt; python3 setup.py install
+RUN echo ${CUDA_HOME}
+RUN cd /root/torch2trt; CUDA_HOME="/usr/local/cuda" python3 setup.py install
 # RUN cd /root/YOLOX && python3 tools/trt.py -n yolox-s -c yolox_s.pth
