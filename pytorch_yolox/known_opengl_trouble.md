@@ -1,23 +1,9 @@
 OpenGL のエラーのうち、いくつかはこういった理由で生じる。
 
-```commandline
-error check 1
-error check 2
 freeglut (demo_zed.py):  ERROR:  Internal error <FBConfig with necessary capabilities not found> in function fgOpenWindow
 Segmentation fault (core dumped)
 root@orin:~/yolox-zed-sdk/tools#
 ```
-
-## 理由１　引数の間違い
-```
-glutInitDisplayMode(GL_DOUBLE | GL_RGB | GL_DEPTH);
-...should be
-glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-```
-https://ubuntuforums.org/archive/index.php/t-1379495.html
-
-統合環境によっては、参照できない変数にwarningが生じるので、それを見落とさないこと。
-
 
 ### glutInit()の謎
 なぜ、コマンドライン引数を必要とするのか？

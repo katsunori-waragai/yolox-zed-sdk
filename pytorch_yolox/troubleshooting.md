@@ -1,4 +1,4 @@
-# 解決済みのtrouble
+# resolved troubles
 # on converting into tensortRT
 [TRT] [W] Unknown embedded device detected. Using 59656MiB as the allocation cap for memory on embedded devices.
 harmless
@@ -24,5 +24,5 @@ Traceback (most recent call last):
     cv._registerMatType(Mat)
 AttributeError: partially initialized module 'cv2' has no attribute '_registerMatType' (most likely due to a circular import)
 ```
-- これはopencv-python のバージョンが悪い。
-- 別のバージョンを用いること。
+- This is a bad version of opencv-python.
+- Use another version.
