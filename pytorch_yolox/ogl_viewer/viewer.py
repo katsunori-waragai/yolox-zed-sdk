@@ -397,39 +397,26 @@ class GLViewer:
         wnd_h = int(glutGet(GLUT_SCREEN_HEIGHT) * 0.9)
         glutInitWindowSize(wnd_w, wnd_h)
         glutInitWindowPosition(int(wnd_w * 0.05), int(wnd_h * 0.05))
-        print("error check 1")
 
-        # glutInitDisplayMode(GLUT_DOUBLE | GLUT_SRGB | GLUT_DEPTH)
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH)
-        print("error check 2")
         glutCreateWindow("ZED Object Detection")
-        print("error check 3")
         glViewport(0, 0, wnd_w, wnd_h)
-        print("error check 4")
         glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
                       GLUT_ACTION_CONTINUE_EXECUTION)
-        print("error check 5")
 
         glEnable(GL_DEPTH_TEST)
-        print("error check 6")
 
         glEnable(GL_BLEND)
-        print("error check 7")
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        print("error check 8")
 
         glEnable(GL_LINE_SMOOTH)
-        print("error check 9")
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
-        print("error check 10")
 
         self.is_tracking_on = is_tracking_on
 
         # Compile and create the shader for 3D objects
         self.shader_image = Shader(VERTEX_SHADER, FRAGMENT_SHADER)
-        print("error check 11")
         self.shader_image_MVP = glGetUniformLocation(self.shader_image.get_program_id(), "u_mvpMatrix")
-        print("error check 12")
 
         self.shader_pc = Shader(POINTCLOUD_VERTEX_SHADER, POINTCLOUD_FRAGMENT_SHADER)
         self.shader_pc_MVP = glGetUniformLocation(self.shader_pc.get_program_id(), "u_mvpMatrix")
