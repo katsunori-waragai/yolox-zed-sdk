@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/l4t-pytorch:r35.2.1-pth2.0-py3
+FROM stereolabs/zed:4.2-py-devel-jetson-jp5.1.0
 RUN apt update
 RUN apt install sudo
 RUN apt-get install -y zip
@@ -12,12 +12,6 @@ RUN apt-get install -y tensorrt nvidia-tensorrt-dev python3-libnvinfer-dev
 RUN python3 -m pip install -U pip
 COPY ./requirements.txt /root/
 RUN python3 -m pip install -r /root/requirements.txt
-
-ENV ZED_SDK_INSTALLER=ZED_SDK_Tegra_L4T35.2_v4.2.2.zstd.run
-RUN wget -O ${ZED_SDK_INSTALLER} https://download.stereolabs.com/zedsdk/4.2/l4t35.2/jetsons
-RUN chmod +x ${ZED_SDK_INSTALLER}
-RUN apt install zstd
-RUN ./${ZED_SDK_INSTALLER} -- silent
 
 RUN cd /root && git clone https://github.com/Megvii-BaseDetection/YOLOX.git
 RUN cd /root/YOLOX && \
