@@ -8,3 +8,5 @@ tabulate
 thop
 tqdm
 ultralytics
+torch
+torchvision
